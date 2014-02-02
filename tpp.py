@@ -28,12 +28,12 @@ for line in tplines:
         if ':\n' in line:
             project = line.strip()[:-1]
         if '@due' in line:
-            duetag = re.search('\@due\((.*?)\)', line).group(1)
+            duetag = re.search(r'\@due\((.*?)\)', line).group(1)
             taskdate = parser.parse(duetag)
             flaglist.append(
                 Flagged('due', taskdate, project, line.strip()))
         if '@start' in line:
-            starttag = re.search('\@start\((.*?)\)', line).group(1)
+            starttag = re.search(r'\@start\((.*?)\)', line).group(1)
             taskdate = parser.parse(starttag)
             flaglist.append(
                 Flagged('start', taskdate, project, line.strip()))
