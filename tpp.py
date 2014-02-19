@@ -63,7 +63,6 @@ if not today:
 print '\nOVERDUE\n'
 
 for task in flaglist:
-    # if task.type == 'due' and datetime.now() > task.taskdate:
     if task.type == 'due' and today_date > task.taskdate:
         overdue = True
         print '\t[%s] %s' % (task.project, task.task)
