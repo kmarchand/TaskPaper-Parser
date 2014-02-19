@@ -29,12 +29,12 @@ for line in tplines:
             project = line.strip()[:-1]
         if '@due' in line:
             duetag = re.search(r'\@due\((.*?)\)', line).group(1)
-            taskdate = parser.parse(duetag)
+            taskdate = datetime.date(parser.parse(duetag))
             flaglist.append(
                 Flagged('due', taskdate, project, line.strip()))
         if '@start' in line:
             starttag = re.search(r'\@start\((.*?)\)', line).group(1)
-            taskdate = parser.parse(starttag)
+            taskdate = datetime.date(parser.parse(starttag))
             flaglist.append(
                 Flagged('start', taskdate, project, line.strip()))
         if '@today' in line:
@@ -44,6 +44,7 @@ for line in tplines:
         errlist.append((line, e))
 
 today = overdue = duethisweek = startthisweek = None
+today_date = datetime.date(datetime.now())
 
 print 'SUMMARY for %s [%s]' % (tpfile, str(datetime.now())[:16])
 
@@ -53,13 +54,17 @@ for task in flaglist:
     if task.type == 'today':
         today = True
         print '\t[%s] %s' % (task.project, task.task)
+    elif task.type == 'due' and today_date == task.taskdate:
+        today = True
+        print '\t[%s] %s' % (task.project, task.task)
 if not today:
     print '\t (none)'
 
 print '\nOVERDUE\n'
 
 for task in flaglist:
-    if task.type == 'due' and datetime.now() > task.taskdate:
+    # if task.type == 'due' and datetime.now() > task.taskdate:
+    if task.type == 'due' and today_date > task.taskdate:
         overdue = True
         print '\t[%s] %s' % (task.project, task.task)
 if not overdue:
@@ -68,8 +73,8 @@ if not overdue:
 print '\nDUE THIS WEEK\n'
 
 for task in flaglist:
-    weeklater = datetime.now() + timedelta(days=7)
-    if task.type == 'due' and datetime.now() < task.taskdate < weeklater:
+    weeklater = today_date + timedelta(days=7)
+    if task.type == 'due' and today_date < task.taskdate < weeklater:
         duethisweek = True
         print '\t[%s] %s' % (task.project, task.task)
 if not duethisweek:
@@ -78,8 +83,8 @@ if not duethisweek:
 print '\nSTARTING THIS WEEK\n'
 
 for task in flaglist:
-    weeklater = datetime.now() + timedelta(days=7)
-    if task.type == 'start' and datetime.now() < task.taskdate < weeklater:
+    weeklater = today_date + timedelta(days=7)
+    if task.type == 'start' and today_date < task.taskdate < weeklater:
         startthisweek = True
         print '\t[%s] %s' % (task.project, task.task)
 if not startthisweek:
